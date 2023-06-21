@@ -1,4 +1,4 @@
-## [Full Stack Open](https://fullstackopen.com/es/)
+# [Full Stack Open](https://fullstackopen.com/es/)
 
 This course is held at the Department of Computer Science at the University of Helsinki.
 
@@ -9,3 +9,5 @@ GraphQL, a modern alternative to REST APIs is also covered by this course. As we
 ### [Part 0 - Fundamentals of Web apps](./part0)
 
 ### [Part 1 - Introduction to React](./part1)
+
+### [Part 2 - Communicating with server](./part2)
