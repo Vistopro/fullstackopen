@@ -9,8 +9,17 @@ const create = newObject => {
   return axios.post(baseUrl, newObject)
 }
 
+const deletePerson = (id) => {
+  return axios.delete(baseUrl + '/' + id)
+}
+
+const changePhone = (person, id) => {
+  return axios.put(baseUrl + '/' + id,  person)
+}
 
 export default { 
   getAll,
-  create
+  create, 
+  deletePerson,
+  changePhone
 }
