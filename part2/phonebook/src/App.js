@@ -3,12 +3,14 @@ import PersonsForm from './components/PersonsForm'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import personsService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newPhone, setNewPhone ] = useState('')
   const [ newFilter, setNewFilter ] = useState('')
+  const [ errorMessage, setErrorMessage ] = useState(null) 
 
   useEffect(() => {
     personsService
@@ -22,23 +24,38 @@ const App = () => {
   
   const addPerson = (event) => {
     event.preventDefault();
-    if (persons.some(person => person.name.toLowerCase === newName.trim().toLowerCase) && 
-    persons.some(person => person.phone !== newPhone.trim())) {
+
+    const existingPerson = persons.find(person => person.name.toLowerCase() === newName.toLowerCase())
+
+    if (existingPerson) {
+      if (existingPerson.number === newPhone.trim()) {
+        window.alert(newName + ' is already added to the phonebook');
+      } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one? `)) 
       {
-        const personChanged = persons.filter(person => person.name.toLowerCase() === newName.toLowerCase())
-        personChanged[0].number = newPhone
-        console.log(personChanged)
+        const updatedPerson = { ...existingPerson, number: newPhone.trim() };
+  
          personsService
-        .changePhone(personChanged[0], personChanged[0].id)
+        .changePhone(updatedPerson, updatedPerson.id)
         .then(response => {
           console.log('cambiado')
+          setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person));
+          setErrorMessage(newName + ' number changed')
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          console.log('fail')
+          setErrorMessage(`Information of ${newName} has already been removed from server`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+          setPersons(persons.filter(person => person.id !== updatedPerson.id ))
         })
       }
-     } else if ((persons.some(person => person.name === newName.trim()) && 
-      persons.some(person => person.phone === newPhone.trim())) ){
-        window.alert(newName + ' is already added to phonebook');
-  } else if (newName.trim() === '' || newPhone.trim() === '' ){
+      }
+    } else if (newName.trim() === '' || newPhone.trim() === '' ){
       window.alert('Please enter a name and phone number');
     } else {
       const newPerson = {
@@ -50,6 +67,10 @@ const App = () => {
         .create(newPerson)
           .then(response => {
             console.log('añadido')
+            setErrorMessage(newName + ' added')
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
       setPersons(persons.concat(newPerson))
     }
@@ -77,6 +98,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter newFilter={newFilter} setNewFilter = {setNewFilter} />
       <h2>Add a new</h2>
       <PersonsForm newName={newName} newPhone={newPhone} setNewName={setNewName} setNewPhone={setNewPhone} addPerson={addPerson} />

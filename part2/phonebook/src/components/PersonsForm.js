@@ -21,7 +21,6 @@ const PersonsForm = (props) => {
   </div>
   <div>
     <button onClick={(event) => props.addPerson(event)} type="submit" >add</button>
-
   </div>     
   </form>
 
